@@ -23,7 +23,7 @@ exceptiongroup==1.0.0
 executing==1.2.0
 fastjsonschema==2.16.2
 Flask==2.2.2
-Flask-SQLAlchemy==3.0.2
+flask-sqlalchemy==2.5.1
 fonttools==4.38.0
 idna==3.4
 importlib-metadata==5.0.0
