@@ -1,55 +1,46 @@
 
-#app.py
-from email.mime import application
-from flask import Flask, flash, request, redirect, url_for, render_template
-import urllib.request
-import os
-from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
-UPLOAD_FOLDER = 'static/uploads/'
-app.secret_key = "secret key"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+from flask import Flask,  render_template, send_from_directory, url_for
+from flask_uploads import UploadSet, IMAGES, configure_uploads
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileField, FileRequired
+from wtforms import SubmitField
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'JPG'])
+application = Flask(__name__)
+app = application
+app.config['SECRET_KEY']='sdfdsf'
+app.config['UPLOADED_PHOTOS_DEST']='uploads'
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+photos = UploadSet('photos', IMAGES)
+configure_uploads(app, photos)
 
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+class UploadForm(FlaskForm):
+    photo = FileField(
+        validators=[
+            FileAllowed(photos, 'Only images are allowed'),
+            FileRequired('File field should not be empty')
+        ]
+    )
+    submit = SubmitField('Upload')
 
-@app.route('/', methods=['POST'])
+@app.route('/uploads/<filename>')
+def get_file(filename):
+    return send_from_directory(app.config['UPLOADED_PHOTOS_DEST'], filename)
+
+
+@app.route('/', methods=['GET','POST'])
 def upload_image():
-    if 'file' not in request.files:
-        flash('No file part')
-        return redirect(request.url)
-    file = request.files['file']
-    if file.filename == '':
-        flash('No image selected for uploading')
-        return redirect(request.url)
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        #print('upload_image filename: ' + filename)
-        flash('Image successfully uploaded and displayed below')
-        return render_template('index.html', filename=filename)
+    form = UploadForm()
+    if form.validate_on_submit():
+        filename = photos.save(form.photo.data)
+        file_url = url_for('get_file', filename=filename)
     else:
-        flash('Allowed image types are - png, jpg, jpeg, gif')
-        return redirect(request.url)
+        file_url = None
+    return render_template('index.html', form=form, file_url=file_url)
 
-@app.route('/display/<filename>')
-def display_image(filename):
-    #print('display_image filename: ' + filename)
-    return redirect(url_for('static', filename='uploads/' + filename), code=301)
-
-if __name__ == "__main__":
-    app.run()
-
-
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 

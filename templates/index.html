@@ -1,47 +1,45 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>Python Flask Upload and display image</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <title>Unilaser</title>
 </head>
 <body>
-<p><h1 align="center">Python Flask Upload and display image</h1></p>
-<div class="container">
-<div class="row">
-    <h2>Select a file to upload</h2>
-    <p>
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul>
-            {% for message in messages %}
-              <li>{{ message }}</li>
-            {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-    </p>
-    {% if filename %}
-        <div>
-            <img src="{{ url_for('display_image', filename=filename) }}">
-        </div>
-    {% endif %}
-    <form method="post" action="/" enctype="multipart/form-data">
-        <dl>
-            <p>
-                <input type="file" name="file" class="form-control" autocomplete="off" required>
-            </p>
-        </dl>
-        <p>
-            <input type="submit" value="Submit" class="btn btn-info">
-        </p>
-    </form>
-</div>
-</div>
+  <div class="container">
+    <div class="row">
+      <div class="col-6 mx auto mt-g text-center">
+        <h1 class="mb-5">Hair Counter</h1>
+
+        <form method="post" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          {% for error in form.photo.errors %}
+            <span style = "color:red;">{{ error }}</span>
+          {% endfor %}
+
+          <div class="row justify-content-center">
+            <div class="col-auto"></div>
+              {{ form.photo(class='form-control') }}
+            <div class="col-auto"></div>
+              {{ form.submit(class='btn btn-success') }}
+          </div>
+
+        </form>
+
+        {% if file_url %}
+          <div class="mt-5">
+            <img src="{{ file_url }}" style="width:400px;">
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
-
-
-
 
 
 
