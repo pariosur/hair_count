@@ -1,10 +1,12 @@
 
-
-from flask import Flask,  render_template, send_from_directory, url_for
+from flask import Flask,  render_template, send_from_directory, url_for, request, make_response
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import SubmitField
+from hair_counter import counter
+import cv2
+import numpy as np
 
 application = Flask(__name__)
 app = application
@@ -26,17 +28,30 @@ class UploadForm(FlaskForm):
 
 @app.route('/uploads/<filename>')
 def get_file(filename):
-    return send_from_directory(app.config['UPLOADED_PHOTOS_DEST'], filename)
+    img_display = send_from_directory(app.config['UPLOADED_PHOTOS_DEST'], filename)
+    return img_display
 
 
 @app.route('/', methods=['GET','POST'])
 def upload_image():
     form = UploadForm()
+
     if form.validate_on_submit():
+
         filename = photos.save(form.photo.data)
+        # print(img_display)
         file_url = url_for('get_file', filename=filename)
+        # img_path = send_from_directory(app.config['UPLOADED_PHOTOS_DEST'], str(filename))
+        # print(file_url)
+        # image_to_transform = cv2.imread(img_path)
+        image_url = request.args.get('imageurl')
+        requested_url = urllib.urlopen(image_url)
+        image_array = np.asarray(bytearray(requested_url.read()), dtype=np.uint8)
+        img_to_transform = cv2.imdecode(image_array, -1)
+        counter(img_to_transform)
     else:
         file_url = None
+
     return render_template('index.html', form=form, file_url=file_url)
 
 if __name__ == '__main__':
