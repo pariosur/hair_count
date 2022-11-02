@@ -3,7 +3,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import cv2
 
-def counter(img):
+def counter(image_name):
+
+    path = '/uploads/' + image_name
+    img = cv2.imread(path)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray,(15,15),0)
     canny = cv2.Canny(blur, 20, 20,3)

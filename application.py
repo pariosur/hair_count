@@ -1,10 +1,10 @@
-
 from flask import Flask,  render_template, send_from_directory, url_for, request, make_response
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import SubmitField
 from hair_counter import counter
+import urllib.request
 import cv2
 import numpy as np
 
@@ -14,7 +14,7 @@ app.config['SECRET_KEY']='sdfdsf'
 app.config['UPLOADED_PHOTOS_DEST']='uploads'
 
 photos = UploadSet('photos', IMAGES)
-configure_uploads(app, photos)
+configure_uploads(application, photos)
 
 
 class UploadForm(FlaskForm):
@@ -41,14 +41,16 @@ def upload_image():
         filename = photos.save(form.photo.data)
         # print(img_display)
         file_url = url_for('get_file', filename=filename)
+        # file = request.files['file']
         # img_path = send_from_directory(app.config['UPLOADED_PHOTOS_DEST'], str(filename))
         # print(file_url)
         # image_to_transform = cv2.imread(img_path)
-        image_url = request.args.get('imageurl')
-        requested_url = urllib.urlopen(image_url)
-        image_array = np.asarray(bytearray(requested_url.read()), dtype=np.uint8)
-        img_to_transform = cv2.imdecode(image_array, -1)
-        counter(img_to_transform)
+        # image_url = request.args.get('imageurl')
+        # requested_url = urllib.request.urlopen(file_url)
+        # image_array = np.asarray(bytearray(requested_url.read()), dtype=np.uint8)
+        # img_to_transform = cv2.imdecode(image_array, -1)
+        # name = file_url
+        # counter(name)
     else:
         file_url = None
 
